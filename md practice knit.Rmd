@@ -4,10 +4,19 @@ author: "Whitney Shegrud"
 date: "February 27, 2019"
 output: html_document
 ---
+## GitHub Practice for Quant Bio
+#downloading packages
 
-```{r setup, include=FALSE}
+```
+{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+```{r}
+library(readxl)      # load readxl, for reading Excel files
+library(tidyverse)   # load tidyverse, for working with datasets
+```
+
 
 ## R Markdown
 
@@ -15,11 +24,108 @@ This is an R Markdown document. Markdown is a simple formatting syntax for autho
 
 When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
 
-```{r cars}
-summary(cars)
+```{r}
+finches <- read_excel("finches_data.xlsx")
+
+finches
+
+glimpse(finches)
 ```
 
 ## Including Plots
+#Historgram
+
+```{r}
+ggplot(
+  data = finches,                     # use the finches dataset
+  mapping = aes(x = beak_length,      # put beak length on the x axis
+                fill = outcome)       # fill sets the color of the boxes
+) +
+  geom_histogram(bins = 14) +         # add the histogram, use 14 bins
+  facet_wrap(~ outcome, ncol = 1) +   # outcome is the grouping variable
+  guides(fill = FALSE) +              # don't show a legend for fll color
+  labs(
+    title = "Figure 1.",              # title
+    x = "Beak Length (mm)",           # x-axis label
+    y = "Number of Birds"             # y-axis label
+  )
+```
+
+##Summarising Data
+#Summarise by death and survive
+
+```{r}
+beak_length_grouped_summary <- 
+  finches %>% 
+  group_by(outcome) %>% 
+  summarize(mean = mean(beak_length),
+            sd = sd(beak_length),
+            n = n()) %>% 
+  mutate(sem = sd / sqrt(n),
+         upper = mean + 1.96 * sem,
+         lower = mean - 1.96 * sem)
+```
+
+##Print the results 
+
+```{r}
+beak_length_grouped_summary
+```
+
+##Bar plot
+```{r}
+ggplot(
+  data = beak_length_grouped_summary,   # dont use the original finches dataset
+  mapping = aes(x = outcome,            # survival on the x axis
+                y = mean,               # mean beak length on the y axis
+                fill = outcome)         # make died/survived different colors
+) +
+  geom_col() +                          # add columns
+  geom_errorbar(                        # add error bars
+    mapping = aes(ymin = lower,         #   lower 95% confidence limit
+                  ymax = upper),        #   upper 95% confidence limit
+    width = .3                          #   width of horizontal part of bars
+  ) +
+  guides(fill = FALSE) +                # don't show a legend for fll color
+  labs(
+    title = "Figure 2.",                # title
+    x = "Survival Outcome",             # x-axis label
+    y = "Beak Length (mm)"              # y-axis label
+  )
+```
+
+##ttest
+
+```{r}
+
+beak_length_died <-
+  finches %>%                     # start with finches dataset
+  filter(outcome == "died") %>%   # only include rows w/ outcome=died
+  pull(beak_length)
+```
+
+```{r}
+beak_length_died
+```
+
+```{r}
+beak_length_survived <-
+  finches %>% 
+  filter(outcome == "survived") %>% 
+  pull(beak_length)
+```
+
+```{r}
+beak_length_survived
+```
+
+```{r}
+t.test(beak_length_died, beak_length_survived)
+```
+
+
+
+
 
 You can also embed plots, for example:
 
