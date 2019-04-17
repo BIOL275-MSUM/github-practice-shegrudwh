@@ -2,7 +2,7 @@
 title: "GitHub Practice"
 author: "Whitney Shegrud"
 date: "February 27, 2019"
-output: html_document
+output: "github_document"
 ---
 ## GitHub Practice for Quant Bio
 #downloading packages
@@ -123,14 +123,3 @@ beak_length_survived
 t.test(beak_length_died, beak_length_survived)
 ```
 
-
-
-
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
-```
-
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
